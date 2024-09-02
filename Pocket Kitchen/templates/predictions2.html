@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Fruit Detection - Predictions</title>
+</head>
+<body>
+<h1>Fruit Detection - Predictions</h1>
+<table border="1">
+    <tr>
+        <th>Fruit</th>
+        <th>Count</th>
+    </tr>
+    {% for prediction in predictions %}
+    <tr>
+        <td>{{ prediction[0] }}</td>
+        <td>{{ prediction[1] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

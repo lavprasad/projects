@@ -1,0 +1,227 @@
+<!-- predictions.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Fruit Detection - Predictions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 2px solid #ddd; /* Add border to the entire table */
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            border-right: 1px solid #ddd; /* Add border between cells */
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .actions button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .actions button:hover {
+            background-color: #0056b3;
+        }
+
+        .actions form {
+            display: inline;
+        }
+
+        .actions form button {
+            background-color: #dc3545;
+        }
+
+        .actions form button:hover {
+            background-color: #c82333;
+        }
+
+        .add-item-button {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-item-button:hover {
+            background-color: #218838;
+        }
+
+        .remove-button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .remove-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Fruit Detection - Predictions</h1>
+    <table>
+        <tr>
+            <th>Fruit</th>
+            <th>Count</th>
+            <th>Expiry Date</th>
+            <th>Actions</th>
+        </tr>
+        {% for prediction in predictions %}
+        {% if prediction[1] > 0 %}
+        <tr>
+            <td>{{ prediction[0] }}</td>
+            <td id="count{{ loop.index }}">{{ prediction[1] }}</td>
+            <td>{{ prediction[2] }}</td>
+            <td class="actions">
+                <button onclick="decrementQuantity({{ loop.index }})">-</button>
+                <button onclick="incrementQuantity({{ loop.index }})">+</button>
+                <form action="/modify" method="post">
+                    <input name="fruit" type="hidden" value="{{ prediction[0] }}">
+                    <input name="action" type="hidden" value="remove">
+                    <button class="remove-button" type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+    <button class="add-item-button" onclick="addItem()">Add Item</button>
+</div>
+<script>
+    function incrementQuantity(index) {
+        var countElement = document.getElementById('count' + index);
+        var count = parseInt(countElement.innerText);
+        count++;
+        countElement.innerText = count;
+    }
+
+    function decrementQuantity(index) {
+        var countElement = document.getElementById('count' + index);
+        var count = parseInt(countElement.innerText);
+        if (count > 0) {
+            count--;
+            countElement.innerText = count;
+        }
+    }
+
+    function addItem() {
+        var fruit = prompt("Enter the name of the fruit from the list:\n['apple', 'banana', 'beetroot', 'bell pepper', 'cabbage', 'capsicum', 'carrot', 'cauliflower', 'chilli pepper', 'corn', 'cucumber', 'eggplant', 'garlic', 'ginger', 'grapes', 'jalepeno', 'kiwi', 'lemon', 'lettuce', 'mango', 'onion', 'orange', 'paprika', 'pear', 'peas', 'pineapple', 'pomegranate', 'potato', 'raddish', 'soy beans', 'spinach', 'sweetcorn', 'sweetpotato', 'tomato', 'turnip', 'watermelon']");
+        if (fruit && fruit.trim() !== "") {
+            var count = prompt("Enter the quantity of " + fruit + ":");
+            if (count && !isNaN(count)) {
+                // Add the new item to the table
+                var table = document.querySelector("table");
+                var newRow = table.insertRow(-1);
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                var cell3 = newRow.insertCell(2);
+                var cell4 = newRow.insertCell(3);
+                cell1.innerText = fruit;
+                cell2.innerText = count;
+                var today = new Date();
+                var expiryDate = new Date(today);
+                expiryDate.setDate(today.getDate() + getFreshnessDays(fruit));
+                cell3.innerText = expiryDate.toDateString();
+                cell4.innerHTML = `<form action="/modify" method="post">
+                                        <input type="hidden" name="fruit" value="${fruit}">
+                                        <input type="hidden" name="action" value="remove">
+                                        <button class="remove-button" type="submit">Remove</button>
+                                    </form>`;
+            } else {
+                alert("Invalid quantity! Please enter a valid number.");
+            }
+        }
+    }
+
+    function getFreshnessDays(fruit) {
+        const freshnessDays = {
+            'apple': 10,
+            'banana': 5,
+            'beetroot': 7,
+            'bell pepper': 8,
+            'cabbage': 10,
+            'capsicum': 8,
+            'carrot': 14,
+            'cauliflower': 7,
+            'chilli pepper': 5,
+            'corn': 4,
+            'cucumber': 7,
+            'eggplant': 7,
+            'garlic': 60,
+            'ginger': 30,
+            'grapes': 5,
+            'jalepeno': 7,
+            'kiwi': 14,
+            'lemon': 14,
+            'lettuce': 7,
+            'mango': 7,
+            'onion': 60,
+            'orange': 14,
+            'paprika': 10,
+            'pear': 14,
+            'peas': 4,
+            'pineapple': 7,
+            'pomegranate': 14,
+            'potato': 30,
+            'raddish': 10,
+            'soy beans': 5,
+            'spinach': 7,
+            'sweetcorn': 4,
+            'sweetpotato': 30,
+            'tomato': 7,
+            'turnip': 10,
+            'watermelon': 7
+        };
+        return freshnessDays[fruit] || 7;  // Default to 7 days if not found
+    }
+</script>
+</body>
+</html>
