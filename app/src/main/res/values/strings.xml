@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Media Player App</string>
+    <string name="title_media">Media</string>
+    <string name="title_playlists">Playlists</string>
+    <string name="create_playlist">Create Playlist</string>
+    <string name="playlist_name">Playlist Name</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_to_playlist">Add to Playlist</string>
+    <string name="select_playlist">Select a Playlist</string>
+    <string name="permission_required">Storage permission is required</string>
+    <string name="permission_rationale">This app needs access to your media files to play music</string>
+    <string name="playing_now">Now Playing</string>
+    <string name="no_media_found">No media files found</string>
+    <string name="no_playlists_found">No playlists found</string>
+</resources> 
